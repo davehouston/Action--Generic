@@ -1,0 +1,176 @@
+=head1 NAME
+
+Action::Generic - Run generic actions in an OO way
+
+=head1 SYNOPSIS
+
+ my $controller = Action::Generic->new();
+
+ my $system = $controller->action(
+  type => 'System',
+  name => 'List my homedir!',
+  params => [('ls', '-l', '~')]
+ );
+
+ my $custom = $controller->action(
+  type => 'Custom',
+  name => 'Say hi',
+  code => sub { print "hi\n" }
+ );
+
+ $controller->add_actions( $system, $custom );
+
+ $controller->run();
+
+ use Data::Dumper;
+ print Dumper( $controller->results );
+
+=head1 DESCRIPTION
+
+This is intended to create a simple framework for running
+a series of actions or other complex bits of .. something ..
+in a series.
+
+It works by creating a "controller" object.
+
+ my $controller = Action::Generic->new();
+
+An option parameter, C<quiet> may be provided.
+ 
+You may then create some actions.  This is done by making the 
+controller do the legwork with the C<action()> method.
+
+ my $system = $controller->action(
+  type => 'System',
+  name => 'What time is it!'
+  params => [('date')]
+ );
+
+Creating an action is only the first step.  Most cases will
+almost immediately want to add the new action to the stack:
+
+ $controller->add_actions( $system );
+
+Finally, run your actions, in order.
+
+ $controller->run();
+
+And, do what you will with the results.
+
+ use Data::Dumper;
+ print Dumper( $controller->results );
+
+=head1 ACTIONS
+
+There are only a handful that come with this distribution, as 
+the system allows you to easily create what you need.  Those are:
+
+Additionally, you may provide a fully-qualified module to create your
+own shiny new action, with some caveats (see below).
+
+=over 3
+
+=item System
+
+The System action provides the ability to run some arbitrary
+command in your system's shell.  It does not make any checks, and
+is amazingly unsafe.  You should probably check tings before wantonly
+running to the shell.  Maybe use something like L<File::Util> for 
+basic things, first?
+
+=item Custom
+
+The Custom action provides a method to execute an arbitrary coderef.  
+The return value is captured.  
+
+=item Template
+
+The most complex, this action uses L<Template> to render a template
+and stash.  The output is captured.  
+
+=back
+
+=head2 Adding New Actions
+
+There are two ways to add a new action.  You may either place 
+your new action in the C<Action/Generic/Plugin> directory, using
+the namespace C<Action::Generic::Plugin::> for your new action,
+or you may use an entirely different namespace.  The difference is
+best illustrated in example:
+
+ my $plugin = $controller->action(
+  type => 'YourAction',
+  name => 'Your New Plugin Action',
+  ....
+ );
+
+versus
+
+ my $external = $controller->action(
+  type => 'Other::Namespace::Action',
+  name => 'Your new other-namespaced action',
+  ...
+ );
+
+Regardless of how you implement your action, it is treated
+the same way by the controller.  Actions created in the Plugin 
+area are encouraged to use Moose.  Heck, everyone is encouraged
+to use Moose for new things.
+
+Your action must provide:
+
+=over 3
+
+=item An attribute C<name>. 
+
+=item A method, C<run()>.  
+
+=item An attribute, C<_results>.  
+
+=back
+
+Addtionally, any other parameters passed to the controler's C<action()>
+call are passed as a hash to your action's C<new()>.  
+
+The C<name> attribute is used in some logging, but for the most 
+part ignored.  Still required!  
+
+Your action is required to populate the C<_results> hash with the 
+following:
+
+=over 3
+
+=item type
+
+The type of action that was just run.  In most cases, simply using
+C<ref $self> is acceptible.  
+
+=item was_run
+
+A boolean indicating if the action was run. Useful for determining if 
+some other action prematurely stopped running things.
+
+=back
+
+Your action may add any other relevent data to the C<_results> hashref. 
+Any data added here will be available in the controller's C<results()> 
+method.  
+
+=head1 SEE ALSO
+
+L<Moose>, L<Template>
+
+=head1 LICENSE AND COPYING
+
+This library is free software; you may redistribute and/or modify
+it under the same terms as Perl itself.
+
+=head1 BUGS
+
+Probably.  Patches welcome!
+
+=head1 AUTHOR
+
+Dave Houston, C<< <dhouston@cpan.org> >>, 2010
+
+=cut

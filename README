@@ -1,0 +1,145 @@
+NAME
+    Action::Generic - Run generic actions in an OO way
+
+SYNOPSIS
+     my $controller = Action::Generic->new();
+
+     my $system = $controller->action(
+      type => 'System',
+      name => 'List my homedir!',
+      params => [('ls', '-l', '~')]
+     );
+
+     my $custom = $controller->action(
+      type => 'Custom',
+      name => 'Say hi',
+      code => sub { print "hi\n" }
+     );
+
+     $controller->add_actions( $system, $custom );
+
+     $controller->run();
+
+     use Data::Dumper;
+     print Dumper( $controller->results );
+
+DESCRIPTION
+    This is intended to create a simple framework for running a series of
+    actions or other complex bits of .. something .. in a series.
+
+    It works by creating a "controller" object.
+
+     my $controller = Action::Generic->new();
+
+    An option parameter, "quiet" may be provided.
+
+    You may then create some actions. This is done by making the controller
+    do the legwork with the "action()" method.
+
+     my $system = $controller->action(
+      type => 'System',
+      name => 'What time is it!'
+      params => [('date')]
+     );
+
+    Creating an action is only the first step. Most cases will almost
+    immediately want to add the new action to the stack:
+
+     $controller->add_actions( $system );
+
+    Finally, run your actions, in order.
+
+     $controller->run();
+
+    And, do what you will with the results.
+
+     use Data::Dumper;
+     print Dumper( $controller->results );
+
+ACTIONS
+    There are only a handful that come with this distribution, as the system
+    allows you to easily create what you need. Those are:
+
+    Additionally, you may provide a fully-qualified module to create your
+    own shiny new action, with some caveats (see below).
+
+    System
+       The System action provides the ability to run some arbitrary command
+       in your system's shell. It does not make any checks, and is amazingly
+       unsafe. You should probably check tings before wantonly running to
+       the shell. Maybe use something like File::Util for basic things,
+       first?
+
+    Custom
+       The Custom action provides a method to execute an arbitrary coderef.
+       The return value is captured.
+
+    Template
+       The most complex, this action uses Template to render a template and
+       stash. The output is captured.
+
+  Adding New Actions
+    There are two ways to add a new action. You may either place your new
+    action in the "Action/Generic/Plugin" directory, using the namespace
+    "Action::Generic::Plugin::" for your new action, or you may use an
+    entirely different namespace. The difference is best illustrated in
+    example:
+
+     my $plugin = $controller->action(
+      type => 'YourAction',
+      name => 'Your New Plugin Action',
+      ....
+     );
+
+    versus
+
+     my $external = $controller->action(
+      type => 'Other::Namespace::Action',
+      name => 'Your new other-namespaced action',
+      ...
+     );
+
+    Regardless of how you implement your action, it is treated the same way
+    by the controller. Actions created in the Plugin area are encouraged to
+    use Moose. Heck, everyone is encouraged to use Moose for new things.
+
+    Your action must provide:
+
+    An attribute "name".
+    A method, "run()".
+    An attribute, "_results".
+
+    Addtionally, any other parameters passed to the controler's "action()"
+    call are passed as a hash to your action's "new()".
+
+    The "name" attribute is used in some logging, but for the most part
+    ignored. Still required!
+
+    Your action is required to populate the "_results" hash with the
+    following:
+
+    type
+       The type of action that was just run. In most cases, simply using
+       "ref $self" is acceptible.
+
+    was_run
+       A boolean indicating if the action was run. Useful for determining if
+       some other action prematurely stopped running things.
+
+    Your action may add any other relevent data to the "_results" hashref.
+    Any data added here will be available in the controller's "results()"
+    method.
+
+SEE ALSO
+    Moose, Template
+
+LICENSE AND COPYING
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    Probably. Patches welcome!
+
+AUTHOR
+    Dave Houston, "<dhouston@cpan.org>", 2010
+

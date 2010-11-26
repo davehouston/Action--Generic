@@ -1,0 +1,7 @@
+Revision history for Perl extension Action::Generic.
+0.0.3 
+   - Addeed Template action; tests, etc.  
+0.0.2
+   - Basic framework; seems to Do Things.  Which is the point, no?
+0.0.1  Wed Mar 10 19:21:13 2010
+   - Original version.

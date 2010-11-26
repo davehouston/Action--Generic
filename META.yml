@@ -1,0 +1,29 @@
+---
+abstract: 'Run generic actions in an OO way'
+author:
+  - 'Dave Houston, C<< <dhouston@cpan.org> >>, 2010'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Action-Generic
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Log::Dispatch: 2.26
+  Module::Pluggable: 0
+  Moose: 0.98
+  Template: 2.22
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000004
