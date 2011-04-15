@@ -35,7 +35,8 @@ It works by creating a "controller" object.
 
  my $controller = Action::Generic->new();
 
-An option parameter, C<quiet> may be provided.
+An optional parameter, C<quiet> may be provided, which will
+suppress output from the framework.
  
 You may then create some actions.  This is done by making the 
 controller do the legwork with the C<action()> method.
@@ -55,7 +56,8 @@ Finally, run your actions, in order.
 
  $controller->run();
 
-And, do what you will with the results.
+Then you, intrepid module user, shall do what you 
+will with the results. 
 
  use Data::Dumper;
  print Dumper( $controller->results );
@@ -171,6 +173,6 @@ Probably.  Patches welcome!
 
 =head1 AUTHOR
 
-Dave Houston, C<< <dhouston@cpan.org> >>, 2010
+Dave Houston, L<dhouston@cpan.org>, 2011
 
 =cut
